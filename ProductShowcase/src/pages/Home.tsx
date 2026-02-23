@@ -7,6 +7,12 @@ function Home() {
     const [pokemons, setPokemons] = useState<PokemonListItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [search, setSearch] = useState('');
+
+    // filtra a lista de pokémon com base no texto digitado
+    const filteredPokemons = pokemons.filter((pokemon) =>
+        pokemon.name.toLowerCase().includes(search.toLowerCase())
+    );
 
     useEffect(() => {
         async function fetchPokemons() {
@@ -44,13 +50,24 @@ function Home() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-900 px-4 py-8">
+        <div className="min-h-screen bg-gray-900 px-6 md:px-10 lg:px-16 py-8">
             <h1 className="text-4xl font-bold text-center text-white mb-8">
                 Pokédex
             </h1>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 max-w-6xl mx-auto">
-                {pokemons.map((pokemon) => {
+            {/* input de busca */}
+            <div className="max-w-md mx-auto mb-16">
+                <input
+                    type="text"
+                    placeholder="Buscar Pokémon..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-blue-500 transition-colors"
+                />
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
+                {filteredPokemons.map((pokemon) => {
                     const id = getPokemonIdFromUrl(pokemon.url);
                     const imageUrl = getPokemonImageUrl(id);
 
@@ -58,9 +75,9 @@ function Home() {
                         <Link
                             to={`/pokemon/${pokemon.name}`}
                             key={pokemon.name}
-                            className="bg-gray-800 rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-gray-700 hover:scale-105 transition-all duration-200 cursor-pointer"
+                            className="bg-gray-800 rounded-2xl p-5 flex flex-col items-center gap-2 hover:bg-gray-700 hover:scale-105 transition-all duration-200 cursor-pointer"
                         >
-                            <span className="text-xs text-gray-500 self-end">
+                            <span className="text-xs text-gray-500 self-end mr-1">
                                 #{String(id).padStart(3, '0')}
                             </span>
                             <img
