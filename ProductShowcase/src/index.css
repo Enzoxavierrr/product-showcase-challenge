@@ -5,3 +5,15 @@ body {
   background-color: #111827;
   font-family: system-ui, -apple-system, sans-serif;
 }
+
+/* animação da estrela ao favoritar */
+@keyframes star-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.5); }
+  100% { transform: scale(1.1); }
+}
+
+.star-favorited {
+  animation: star-pop 0.3s ease-out;
+  transform: scale(1.1);
+}

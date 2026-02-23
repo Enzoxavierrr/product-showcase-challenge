@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { TeamContext } from '../contexts/TeamContext';
+import { TeamContext } from '../contexts/teamContextDef';
 
 // hook personalizado para usar o contexto do time
 export function useTeam() {

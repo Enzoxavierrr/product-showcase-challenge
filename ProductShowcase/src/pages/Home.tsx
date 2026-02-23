@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import type { PokemonListItem } from '../types/pokemon';
 import { getPokemonList, getPokemonIdFromUrl, getPokemonImageUrl } from '../services/pokemonService';
 import { useTeam } from '../hooks/useTeam';
@@ -10,6 +10,7 @@ function Home() {
     const [error, setError] = useState<string | null>(null);
     const [search, setSearch] = useState('');
     const { addToTeam, removeFromTeam, isInTeam } = useTeam();
+    const navigate = useNavigate();
 
     // filtra a lista de pokémon com base no texto digitado
     const filteredPokemons = pokemons.filter((pokemon) =>
@@ -72,30 +73,31 @@ function Home() {
                 {filteredPokemons.map((pokemon) => {
                     const id = getPokemonIdFromUrl(pokemon.url);
                     const imageUrl = getPokemonImageUrl(id);
-
-                    const inTeam = isInTeam(pokemon.name);
+                    const favorited = isInTeam(pokemon.name);
 
                     return (
-                        <Link
-                            to={`/pokemon/${pokemon.name}`}
+                        <div
                             key={pokemon.name}
-                            className="bg-gray-800 rounded-2xl p-5 flex flex-col items-center gap-2 hover:bg-gray-700 hover:scale-105 transition-all duration-200 cursor-pointer relative"
+                            onClick={() => navigate(`/pokemon/${pokemon.name}`)}
+                            className="bg-gray-800 rounded-2xl p-5 flex flex-col items-center gap-2 hover:bg-gray-700 hover:scale-105 transition-all duration-200 cursor-pointer"
                         >
                             <div className="flex justify-between items-center w-full">
                                 <button
                                     onClick={(e) => {
-                                        e.preventDefault();
                                         e.stopPropagation();
-                                        if (inTeam) {
+                                        if (favorited) {
                                             removeFromTeam(pokemon.name);
                                         } else {
                                             addToTeam(pokemon.name);
                                         }
                                     }}
-                                    className="text-lg hover:scale-125 transition-transform"
-                                    title={inTeam ? 'Remover do time' : 'Adicionar ao time'}
+                                    className={`text-lg transition-all duration-300 hover:scale-125 ${favorited
+                                            ? 'star-favorited'
+                                            : 'text-gray-500 hover:text-gray-300'
+                                        }`}
+                                    title={favorited ? 'Remover do time' : 'Adicionar ao time'}
                                 >
-                                    {inTeam ? '⭐' : '☆'}
+                                    {favorited ? '⭐' : '★'}
                                 </button>
                                 <span className="text-xs text-gray-500">
                                     #{String(id).padStart(3, '0')}
@@ -110,7 +112,7 @@ function Home() {
                             <p className="text-white font-medium capitalize text-sm">
                                 {pokemon.name}
                             </p>
-                        </Link>
+                        </div>
                     );
                 })}
             </div>
