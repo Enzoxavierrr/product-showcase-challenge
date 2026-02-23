@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { PokemonListItem } from '../types/pokemon';
 import { getPokemonList, getPokemonIdFromUrl, getPokemonImageUrl } from '../services/pokemonService';
+import { useTeam } from '../hooks/useTeam';
 
 function Home() {
     const [pokemons, setPokemons] = useState<PokemonListItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [search, setSearch] = useState('');
+    const { addToTeam, removeFromTeam, isInTeam } = useTeam();
 
     // filtra a lista de pokémon com base no texto digitado
     const filteredPokemons = pokemons.filter((pokemon) =>
@@ -71,15 +73,34 @@ function Home() {
                     const id = getPokemonIdFromUrl(pokemon.url);
                     const imageUrl = getPokemonImageUrl(id);
 
+                    const inTeam = isInTeam(pokemon.name);
+
                     return (
                         <Link
                             to={`/pokemon/${pokemon.name}`}
                             key={pokemon.name}
-                            className="bg-gray-800 rounded-2xl p-5 flex flex-col items-center gap-2 hover:bg-gray-700 hover:scale-105 transition-all duration-200 cursor-pointer"
+                            className="bg-gray-800 rounded-2xl p-5 flex flex-col items-center gap-2 hover:bg-gray-700 hover:scale-105 transition-all duration-200 cursor-pointer relative"
                         >
-                            <span className="text-xs text-gray-500 self-end mr-1">
-                                #{String(id).padStart(3, '0')}
-                            </span>
+                            <div className="flex justify-between items-center w-full">
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        if (inTeam) {
+                                            removeFromTeam(pokemon.name);
+                                        } else {
+                                            addToTeam(pokemon.name);
+                                        }
+                                    }}
+                                    className="text-lg hover:scale-125 transition-transform"
+                                    title={inTeam ? 'Remover do time' : 'Adicionar ao time'}
+                                >
+                                    {inTeam ? '⭐' : '☆'}
+                                </button>
+                                <span className="text-xs text-gray-500">
+                                    #{String(id).padStart(3, '0')}
+                                </span>
+                            </div>
                             <img
                                 src={imageUrl}
                                 alt={pokemon.name}

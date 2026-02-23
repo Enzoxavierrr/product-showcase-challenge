@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import type { PokemonDetails } from '../types/pokemon';
 import { getPokemonDetails } from '../services/pokemonService';
+import { useTeam } from '../hooks/useTeam';
 
 // cores para cada tipo de pokémon
 const typeColors: Record<string, string> = {
@@ -30,6 +31,7 @@ function PokemonDetail() {
     const [pokemon, setPokemon] = useState<PokemonDetails | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { addToTeam, removeFromTeam, isInTeam } = useTeam();
 
     useEffect(() => {
         async function fetchPokemon() {
@@ -102,6 +104,24 @@ function PokemonDetail() {
                     <h1 className="text-4xl font-bold text-white capitalize">
                         {pokemon.name}
                     </h1>
+
+                    {/* botão favorito */}
+                    <button
+                        onClick={() => {
+                            if (isInTeam(pokemon.name)) {
+                                removeFromTeam(pokemon.name);
+                            } else {
+                                addToTeam(pokemon.name);
+                            }
+                        }}
+                        className="px-6 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105"
+                        style={{
+                            backgroundColor: isInTeam(pokemon.name) ? '#EF4444' : '#3B82F6',
+                            color: 'white',
+                        }}
+                    >
+                        {isInTeam(pokemon.name) ? '✕ Remover do Time' : '⭐ Adicionar ao Time'}
+                    </button>
 
                     {/* tipos */}
                     <div className="flex gap-3">
